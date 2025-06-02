@@ -1,0 +1,7 @@
+pandas
+jupyter
+sentence-transformers
+openai
+numpy
+hdbscan
+dotenv

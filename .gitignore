@@ -1,0 +1,7 @@
+# Ignore data files
+data/papers-data/*.jsonl
+data/technologies-data/*.npy
+data/technologies-data/*.parquet
+data/technologies-data/finished_technologies.csv
+# Ignore .env
+.env 
