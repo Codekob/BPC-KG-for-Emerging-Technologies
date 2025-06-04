@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 from openai import AzureOpenAI
 import dotenv
 import pandas as pd
@@ -12,7 +14,10 @@ client = AzureOpenAI(
 )
 
 
-df = pd.read_csv('manual_selected_technologies.csv', encoding='latin-1')
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = PROJECT_ROOT / "data" / "technologies-data"
+
+df = pd.read_csv(DATA_DIR / 'manual_selected_technologies.csv', encoding='latin-1')
 technologies = df['Technology Name'].tolist()
 definition_dictionary = {}
 
@@ -32,12 +37,12 @@ for tech in technologies:
     
 
 output_df = pd.DataFrame(list(definition_dictionary.items()), columns=['Technology Name', 'Definition'])
-output_df.to_csv('technology_definitions.csv', index=False)
+output_df.to_csv(DATA_DIR / 'technology_definitions.csv', index=False)
 
-tech_sources = pd.read_csv('manual_selected_technologies.csv', encoding='latin-1')
-tech_defs = pd.read_csv('technology_definitions.csv')
+tech_sources = pd.read_csv(DATA_DIR / 'manual_selected_technologies.csv', encoding='latin-1')
+tech_defs = pd.read_csv(DATA_DIR / 'technology_definitions.csv')
 
 combined_df = tech_sources.merge(tech_defs[['Technology Name', 'Definition']], on='Technology Name', how='left')
 
-combined_df.to_csv('technologies_with_definitions.csv', index=False)
+combined_df.to_csv(DATA_DIR / 'technologies_with_definitions.csv', index=False)
 print("Combined data saved to technologies_with_definitions.csv")
