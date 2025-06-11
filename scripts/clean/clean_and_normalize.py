@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""
-scripts/clean/normalize_data.py
 
-Normalize, flatten, and deduplicate cleaned datasets of papers and technologies.
-
-Inputs:
- - data/papers-data/cleaned_papers.jsonl (or .json)
- - data/technologies-data/finished_technologies.csv
-
-Outputs:
- - data/papers-data/papers_normalized.csv
- - data/technologies-data/technologies_normalized.csv
-"""
 import pandas as pd
 import string
 from rapidfuzz import fuzz
