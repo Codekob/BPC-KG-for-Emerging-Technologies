@@ -5,3 +5,6 @@ openai
 numpy
 hdbscan
 dotenv
+pyarrow
+
+rapidfuzz         # for fuzzy‐matching
