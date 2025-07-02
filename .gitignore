@@ -4,5 +4,6 @@ data/technologies-data/*.npy
 data/technologies-data/*.parquet
 data/technologies-data/finished_technologies.csv
 data/company-data/*
+data/technologies-data
 # Ignore .env
 .env 
