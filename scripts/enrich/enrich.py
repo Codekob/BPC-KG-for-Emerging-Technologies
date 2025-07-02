@@ -1,43 +1,35 @@
 import os
-from openai import AzureOpenAI
-import dotenv
+from openai import OpenAI 
+from dotenv import load_dotenv
 import pandas as pd
 
-dotenv.load_dotenv()
-
-client = AzureOpenAI(
-    api_version="2024-12-01-preview",
-    azure_endpoint=os.getenv("AZURE_ENDPOINT"),
-    api_key=os.getenv("AZURE_KEY")
+# Load your OpenAI key from .env (set OPENAI_API_KEY)
+load_dotenv()
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
 )
 
+# Read your list of technologies
+df = pd.read_csv("../../data/technologies-data/finished_technologies.csv", encoding="latin-1")
 
-df = pd.read_csv('manual_selected_technologies.csv', encoding='latin-1')
-technologies = df['Technology Name'].tolist()
-definition_dictionary = {}
+def fetch_definition(tech: str) -> str:
+    """Return a one-sentence lay definition, or 'I don't know'."""
 
-for tech in technologies:
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": f"Give a one-sentence definition of {tech} in lay language. Only return the one sentence definition without any additional information. You are used in a pipeline. If you return more than the definition sentence, it will break the pipeline. If you don't know the definition, return 'I don't know'."
-            }
-        ],
-        model="gpt-4o-mini"
-    )
-    definition = response.choices[0].message.content.strip()
-    definition_dictionary[tech] = definition
+    prompt = f"Give a one-sentence definition of {tech} in lay language. Only return the one sentence definition without any additional information. You are used in a pipeline. If you return more than the definition sentence, it will break the pipeline. If you don't know the definition, return 'I don't know'."
+    try:
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=prompt,
+        )
+        return response.output_text
+    except Exception as e:
+        print(f"Error fetching definition for {tech}: {e}")
+        # In case of API errors or rate limits
+        return 
 
-    
+# Apply across the column, writing results into a new "Definition" column
+df["Definition"] = df["Technology Name"].apply(fetch_definition)
 
-output_df = pd.DataFrame(list(definition_dictionary.items()), columns=['Technology Name', 'Definition'])
-output_df.to_csv('technology_definitions.csv', index=False)
-
-tech_sources = pd.read_csv('manual_selected_technologies.csv', encoding='latin-1')
-tech_defs = pd.read_csv('technology_definitions.csv')
-
-combined_df = tech_sources.merge(tech_defs[['Technology Name', 'Definition']], on='Technology Name', how='left')
-
-combined_df.to_csv('technologies_with_definitions.csv', index=False)
-print("Combined data saved to technologies_with_definitions.csv")
+# Output the enriched CSV in one go
+df.to_csv("technologies_with_definitions.csv", index=False)
+print("Saved: technologies_with_definitions.csv")
