@@ -5,5 +5,8 @@ data/technologies-data/*.parquet
 data/technologies-data/finished_technologies.csv
 data/company-data/*
 data/technologies-data
+linking-data/
+linking-data/paper_technology_links.csv
+
 # Ignore .env
 .env 
