@@ -35,8 +35,8 @@ def enrich_technologies(tech_csv: str) -> Path:
             print(f"Error fetching definition for {name}: {exc}")
             return ""
 
-    df["Definition"] = df["Technology Name"].apply(fetch_definition)
-    out_path = Path(tech_csv).with_name("technologies_with_definitions.csv")
+    df["Definition"] = df[df.columns[0]].apply(fetch_definition)
+    out_path = Path(__file__).with_name("technologies_with_definitions.csv")
     df.to_csv(out_path, index=False)
     print(f"Saved definitions to {out_path}")
     return out_path
@@ -208,20 +208,20 @@ def main() -> None:
     parser.add_argument("--end-year", type=int, required=True, help="End year for papers")
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parents[1]
-    papers_dir = repo_root / "data" / "papers-data"
-    company_dir = repo_root / "data" / "company-data"
+    repo_root = Path(__file__).parent
+    papers_dir = repo_root / "papers-data"
+    company_dir = repo_root / "company-data"
 
     enriched = enrich_technologies(args.tech_csv)
     fetch_and_clean_papers(args.start_year, args.end_year, papers_dir)
     fetch_crunchbase_companies(company_dir)
 
-    subprocess.run(["python", str(repo_root / "scripts" / "clean" / "clean_and_normalize.py")], check=True)
-    subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py")], check=True)
-    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
+    # subprocess.run(["python", str(repo_root / "scripts" / "clean" / "clean_and_normalize.py")], check=True)
+    # subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py")], check=True)
+    # subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
 
-    final_csv = papers_dir / "paper_technology_links.csv"
-    print(f"Pipeline finished. Import CSV located at {final_csv}")
+    # final_csv = papers_dir / "paper_technology_links.csv"
+    # print(f"Pipeline finished. Import CSV located at {final_csv}")
 
 
 if __name__ == "__main__":
