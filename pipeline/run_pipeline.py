@@ -19,7 +19,7 @@ CRUNCHBASE_API_KEY = os.getenv("CRUNCHBASE_API_KEY")
 
 def enrich_technologies(tech_csv: str) -> Path:
     """Add one-sentence definitions to technologies using OpenAI."""
-    df = pd.read_csv(tech_csv, encoding="latin-1")
+    df = pd.read_csv(tech_csv, encoding="latin-1", header=None, names=["Technology Name"])
     client = OpenAI(api_key=OPENAI_API_KEY)
 
     def fetch_definition(name: str) -> str:
@@ -216,12 +216,12 @@ def main() -> None:
     fetch_and_clean_papers(args.start_year, args.end_year, papers_dir)
     fetch_crunchbase_companies(company_dir)
 
-    # subprocess.run(["python", str(repo_root / "scripts" / "clean" / "clean_and_normalize.py")], check=True)
-    # subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py")], check=True)
-    # subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
+    subprocess.run(["python", str(repo_root / "scripts" / "clean" / "clean_and_normalize.py")], check=True)
+    subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py")], check=True)
+    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
 
-    # final_csv = papers_dir / "paper_technology_links.csv"
-    # print(f"Pipeline finished. Import CSV located at {final_csv}")
+    final_csv = papers_dir / "paper_technology_links.csv"
+    print(f"Pipeline finished. Import CSV located at {final_csv}")
 
 
 if __name__ == "__main__":
