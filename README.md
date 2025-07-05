@@ -5,7 +5,8 @@
    cp .env.example .env
    ```
 
-2. Edit the .env file to set your email address, this is because the OpenAlex API requires an email for priority access
+2. Edit the `.env` file to set your email address for OpenAlex as well as your
+   `OPENAI_API_KEY` and `CRUNCHBASE_API_KEY`.
 
 3. Install dependencies
     ```bash
@@ -13,7 +14,25 @@
     ```
 
 
-**Normalize** papers and technologies.
+## Running the pipeline
+
+Run the entire process with one command. Provide the CSV of technologies and the
+year range for the papers you want to fetch:
+
+```bash
+python scripts/run_pipeline.py \
+  --tech-csv data/technologies-data/manual_selected_technologies.csv \
+  --start-year 2019 --end-year 2024
+```
+
+The resulting Neo4j import file will be written to
+`data/papers-data/paper_technology_links.csv`.
+
+### Manual steps
+
+If you prefer to run each stage separately:
+
+1. **Normalize** papers and technologies.
    This step produces `papers_normalized.csv` and `technologies_normalized.csv`
    under `data/`.
    ```bash
