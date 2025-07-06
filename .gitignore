@@ -8,5 +8,12 @@ data/technologies-data
 linking-data/
 linking-data/paper_technology_links.csv
 
+# pipeline data 
+pipeline/techlist.csv
+pipeline/technologies_normalized.csv
+pipeline/technologies_with_definitions.csv
+pipeline/papers-data
+pipeline/company-data
+
 # Ignore .env
 .env 
