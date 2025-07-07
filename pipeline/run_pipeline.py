@@ -225,11 +225,17 @@ def main() -> None:
     enrich_technologies(str(repo_root / "pipeline" / "technologies_normalized.csv"))
     
     
-    # subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py")], check=True)
-    # subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
+    subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py"),
+                    "--papers", str(papers_dir / "papers_normalized.csv"),
+                    "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
+                    "--defs", str(repo_root / "pipeline" / "technologies_with_definitions.csv"),
+                    "--output", str(papers_dir / "papers_classified.csv"              
+                                  )],
+                   check=True)
+    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
 
-    # final_csv = papers_dir / "paper_technology_links.csv"
-    # print(f"Pipeline finished. Import CSV located at {final_csv}")
+    final_csv = papers_dir / "paper_technology_links.csv"
+    print(f"Pipeline finished. Import CSV located at {final_csv}")
 
 
 if __name__ == "__main__":

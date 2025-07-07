@@ -25,6 +25,7 @@ import string
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from rapidfuzz import fuzz
+import argparse
 
 # --- Text normalization ---
 def normalize_text(s: str) -> str:
@@ -146,12 +147,18 @@ def classify_papers(
 
 # --- Main ---
 def main():
-    papers, techs = load_inputs()
+    parser = argparse.ArgumentParser(description="Classify papers into technologies")
+    parser.add_argument("--papers", default="../../data/papers-data/papers_normalized.csv", help="Input papers CSV")
+    parser.add_argument("--techs", default="../../data/technologies-data/technologies_normalized.csv", help="Input technologies CSV")
+    parser.add_argument("--defs", default="../../data/technologies-data/technologies_with_definitions.csv", help="Input technology definitions CSV")
+    parser.add_argument("--output", default="../../data/papers-data/papers_classified.csv", help="Output classified papers CSV")
+    args = parser.parse_args()
+
+    papers, techs = load_inputs(args.papers, args.techs, args.defs)
     p_emb, t_emb = compute_embeddings(papers, techs)
     classified = classify_papers(papers, techs, p_emb, t_emb)
-    out = "../../data/papers-data/papers_classified.csv"
-    classified.to_csv(out, index=False)
-    print(f"Wrote {len(classified)} classified papers to {out}")
+    classified.to_csv(args.output, index=False)
+    print(f"Wrote {len(classified)} classified papers to {args.output}")
 
 if __name__=='__main__':
     main()
