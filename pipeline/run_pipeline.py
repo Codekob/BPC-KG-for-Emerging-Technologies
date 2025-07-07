@@ -19,7 +19,8 @@ CRUNCHBASE_API_KEY = os.getenv("CRUNCHBASE_API_KEY")
 
 def enrich_technologies(tech_csv: str) -> Path:
     """Add one-sentence definitions to technologies using OpenAI."""
-    df = pd.read_csv(tech_csv, encoding="latin-1", names=["Technology Name"])
+    df = pd.read_csv(tech_csv, encoding="latin-1")
+    df.columns = ["Technology Name"]
     client = OpenAI(api_key=OPENAI_API_KEY)
 
     def fetch_definition(name: str) -> str:
@@ -208,9 +209,9 @@ def main() -> None:
     parser.add_argument("--end-year", type=int, required=True, help="End year for papers")
     args = parser.parse_args()
 
-    repo_root = Path(__file__).parent
-    papers_dir = repo_root / "papers-data"
-    company_dir = repo_root / "company-data"
+    repo_root = Path(__file__).parent.parent
+    papers_dir = repo_root / "pipeline" / "papers-data"
+    company_dir = repo_root / "pipeline" / "company-data"
 
     fetch_and_clean_papers(args.start_year, args.end_year, papers_dir)
     fetch_crunchbase_companies(company_dir)
@@ -232,9 +233,13 @@ def main() -> None:
                     "--output", str(papers_dir / "papers_classified.csv"              
                                   )],
                    check=True)
-    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py")], check=True)
-
-    final_csv = papers_dir / "paper_technology_links.csv"
+    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py"),
+                    "--papers", str(papers_dir / "papers_classified.csv"),
+                    "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
+                    "--output", str(repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv")],
+                    check=True)
+    
+    final_csv = repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv"
     print(f"Pipeline finished. Import CSV located at {final_csv}")
 
 
