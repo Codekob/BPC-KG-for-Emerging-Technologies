@@ -209,40 +209,51 @@ def main() -> None:
     parser.add_argument("--start-year", type=int, required=True, help="Start year for papers")
     parser.add_argument("--end-year", type=int, required=True, help="End year for papers")
     args = parser.parse_args()
+    
+    
 
     repo_root = Path(__file__).parent.parent
     papers_dir = repo_root / "pipeline" / "papers-data"
     company_dir = repo_root / "pipeline" / "company-data"
-
-    fetch_and_clean_papers(args.start_year, args.end_year, papers_dir)
-    fetch_crunchbase_companies(company_dir)
-
-    subprocess.run([
-        sys.executable, str(repo_root / "scripts" / "clean" / "clean_and_normalize.py"),
-        "--papers-input", str(papers_dir / "cleaned_papers.jsonl"),
-        "--papers-output", str(papers_dir / "papers_normalized.csv"),
-        "--tech-input", str(repo_root / args.tech_csv),
-        "--tech-output", str(repo_root / "pipeline" / "technologies_normalized.csv"),
-    ], check=True)
-
-    # Call enrich.py as a script, outputting JSON
-    tech_norm_csv = str(repo_root / "pipeline" / "technologies_normalized.csv")
-    tech_defs_json = str(repo_root / "pipeline" / "technologies_with_definitions.json")
-    subprocess.run([
-        "python", str(repo_root / "scripts" / "enrich" / "enrich.py"),
-        "--input", tech_norm_csv,
-        "--output", tech_defs_json
-    ], check=True)
     
-    subprocess.run([sys.executable, str(repo_root / "scripts" / "classify" / "classify_papers_v2.py"),],check=True)
+    # Create required directories
+    neo4j_dir = repo_root / "pipeline" / "neo4j-files"
+    neo4j_dir.mkdir(parents=True, exist_ok=True)
     
-    subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py"),
-                    "--papers", str(papers_dir / "papers_classified.csv"),
-                    "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
-                    "--output", str(repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv")],
-                    check=True)
+    nodes_dir = neo4j_dir / "neo4j-nodes"
+    nodes_dir.mkdir(exist_ok=True)
+
+    # fetch_and_clean_papers(args.start_year, args.end_year, papers_dir)
+    # fetch_crunchbase_companies(company_dir)
+
+    # subprocess.run([
+    #     sys.executable, str(repo_root / "scripts" / "clean" / "clean_and_normalize.py"),
+    #     "--papers-input", str(papers_dir / "cleaned_papers.jsonl"),
+    #     "--papers-output", str(papers_dir / "papers_normalized.csv"),
+    #     "--tech-input", str(repo_root / args.tech_csv),
+    #     "--tech-output", str(repo_root / "pipeline" / "technologies_normalized.csv"),
+    # ], check=True)
+
+    # # Call enrich.py as a script, outputting JSON
+    # tech_norm_csv = str(repo_root / "pipeline" / "technologies_normalized.csv")
+    # tech_defs_json = str(repo_root / "pipeline" / "technologies_with_definitions.json")
+    # subprocess.run([
+    #     "python", str(repo_root / "scripts" / "enrich" / "enrich.py"),
+    #     "--input", tech_norm_csv,
+    #     "--output", tech_defs_json
+    # ], check=True)
     
-    subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "full_linking_scripts.py"),])
+    # subprocess.run([sys.executable, str(repo_root / "scripts" / "classify" / "classify_papers_v2.py"),],check=True)
+    
+    # subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py"),
+    #                 "--papers", str(papers_dir / "papers_classified.csv"),
+    #                 "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
+    #                 "--output", str(repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv")],
+    #                 check=True)
+    
+    # subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "full_linking_scripts.py"),])
+    
+    subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "build_entity_nodes.py"),])
     
     
     

@@ -30,18 +30,17 @@ import pandas as pd
 import pathlib
 
 # ─── PATHS ─────────────────────────────────────────────────────────────────────
-BASE         = pathlib.Path('../../data')
 
-TECH_JSON    = BASE / 'technologies-data' / 'technologies_with_definitions.json'
-PAPERS_JSONL = BASE / 'papers-data'       / 'cleaned_papers.jsonl'
-COMP_JSON    = BASE / 'company-data'      / 'crunchbase_fetching_raw.json'
 
-OUT_DIR      = BASE / 'neo4j-nodes'
-OUT_DIR.mkdir(exist_ok=True)
+TECH_JSON    = 'pipeline/technologies_with_definitions.json'
+PAPERS_JSONL = 'pipeline/papers-data/cleaned_papers.jsonl'
+COMP_JSON    = 'pipeline/company-data/crunchbase_fetching_raw.json'
 
-TECH_OUT     = OUT_DIR / 'technologies_nodes.csv'
-PAPER_OUT    = OUT_DIR / 'papers_nodes.csv'
-COMP_OUT     = OUT_DIR / 'companies_nodes.csv'
+OUT_DIR      = 'pipeline/neo4j-files/neo4j-nodes'
+
+TECH_OUT     = f'{OUT_DIR}/technologies_nodes.csv'
+PAPER_OUT    = f'{OUT_DIR}/papers_nodes.csv'
+COMP_OUT     = f'{OUT_DIR}/companies_nodes.csv'
 
 
 # ─── 1) TECHNOLOGIES ───────────────────────────────────────────────────────────
