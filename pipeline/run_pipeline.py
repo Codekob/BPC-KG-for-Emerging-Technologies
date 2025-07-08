@@ -4,6 +4,7 @@ import csv
 import argparse
 import subprocess
 from pathlib import Path
+import sys
 
 import requests
 import pandas as pd
@@ -217,7 +218,7 @@ def main() -> None:
     fetch_crunchbase_companies(company_dir)
 
     subprocess.run([
-        "python", str(repo_root / "scripts" / "clean" / "clean_and_normalize.py"),
+        sys.executable, str(repo_root / "scripts" / "clean" / "clean_and_normalize.py"),
         "--papers-input", str(papers_dir / "cleaned_papers.jsonl"),
         "--papers-output", str(papers_dir / "papers_normalized.csv"),
         "--tech-input", str(repo_root / args.tech_csv),
@@ -233,21 +234,19 @@ def main() -> None:
         "--output", tech_defs_json
     ], check=True)
     
-    subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py"),
-                    "--papers", str(papers_dir / "papers_normalized.csv"),
-                    "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
-                    "--defs", tech_defs_json,
-                    "--output", str(papers_dir / "papers_classified.csv"              
-                                  )],
-                   check=True)
-    subprocess.run(["python", str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py"),
+    subprocess.run([sys.executable, str(repo_root / "scripts" / "classify" / "classify_papers_v2.py"),],check=True)
+    
+    subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "link_papers_to_technology.py"),
                     "--papers", str(papers_dir / "papers_classified.csv"),
                     "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
                     "--output", str(repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv")],
                     check=True)
     
-    final_csv = repo_root / "pipeline" / "neo4j-files" / "paper_technology_links.csv"
-    print(f"Pipeline finished. Import CSV located at {final_csv}")
+    subprocess.run([sys.executable, str(repo_root / "scripts" / "linking" / "full_linking_scripts.py"),])
+    
+    
+    
+    print(f"Pipeline finished. Data located at {repo_root / 'pipeline' / 'neo4j-files'}")
 
 
 if __name__ == "__main__":

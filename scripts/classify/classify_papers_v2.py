@@ -20,8 +20,8 @@ TITLE_FACTOR = 0.3     # additive boost (slightly reduced)
 MIN_ADDITIONAL_SIGNALS = 1  # require at least 1 of {TF-IDF, fuzzy, keyword}
 
 # Paths to data
-PAPERS_PATH = os.path.expanduser('../../data/papers-data/papers_normalized.csv')
-DEFS_PATH   = os.path.expanduser('../../data/technologies-data/technologies_with_definitions.json')
+PAPERS_PATH = os.path.expanduser('pipeline/papers-data/papers_normalized.csv')
+DEFS_PATH   = os.path.expanduser('pipeline/technologies_with_definitions.json')
 
 # Load data
 def load_data():
@@ -114,7 +114,7 @@ def match_technologies(papers, tech_descs):
     return papers
 
 # Save to disk
-def save_classified(papers, out_path='../../data/papers-data/papers_classified.csv'):
+def save_classified(papers, out_path='pipeline/papers-data/papers_classified.csv'):
     t4 = time.time()
     papers.to_csv(out_path, index=False)
     print(f"Saved file in {time.time()-t4:.1f}s at {out_path}")

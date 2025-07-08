@@ -30,11 +30,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from rapidfuzz import fuzz
 
 # ─── CONFIGURATION ─────────────────────────────────────────────────────────────
-RAW_JSON         = '../../data/company-data/crunchbase_fetching_raw.json'
-EMBED_INPUT_CSV  = '../../data/company-data/companies_embedding_input.csv'
-TECHS_JSON       = '../../data/technologies-data/technologies_with_definitions.json'
-OUT_CLASSIFIED   = '../../data/company-data/companies_classified.csv'
-OUT_LINKS        = '../../data/linking-data/company_technology_links.csv'
+RAW_JSON         = 'pipeline/company-data/crunchbase_fetching_raw.json'
+EMBED_INPUT_CSV  = 'pipeline/company-data/companies_embedding_input.csv'
+TECHS_JSON       = 'pipeline/technologies_with_definitions.json'
+OUT_CLASSIFIED   = 'pipeline/company-data/companies_classified.csv'
+OUT_LINKS        = 'pipeline/neo4j-files/company_technology_links.csv'
 
 # Direct category matching thresholds
 CATEGORY_THRESH   = 0.40   # require ≥70% of tech keywords matched

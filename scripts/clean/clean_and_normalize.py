@@ -98,7 +98,7 @@ def normalize_and_dedupe_technologies(
     output_path: str = 'data/technologies-data/technologies_normalized.csv',
     fuzzy_threshold: int = 90
 ):
-    df = pd.read_csv(input_path, header=0, names=['Technology Name'])
+    df = pd.read_csv(input_path, header=0, names=['Technology Name'], quotechar='"')
     df['tech_norm'] = df['Technology Name'].map(normalize_text)
 
     # Exact dedupe

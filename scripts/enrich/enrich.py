@@ -101,4 +101,5 @@ if __name__ == "__main__":
     parser.add_argument("--input", type=str, default="../../data/technologies-data/finished_technologies.csv", help="Input CSV file with technologies")
     parser.add_argument("--output", type=str, default="technologies_with_definitions.json", help="Output JSON file")
     args = parser.parse_args()
+    print("Enriching technologies with definitions, synonyms, and keywords...")
     enrich_technologies(args.input, args.output)

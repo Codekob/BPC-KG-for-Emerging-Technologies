@@ -18,15 +18,14 @@ import sys
 
 SCRIPTS = [
     #'../classify/classify_papers_v2.py',
-    'link_papers_to_technology.py',
-    'link_comp_to_technology.py',
-    'link_comp_to_paper.py'
+    'scripts/linking/link_comp_to_technology.py',
+    'scripts/linking/link_comp_to_paper.py'
 ]
 
 def main():
     for script in SCRIPTS:
         print(f"Running {script}...")
-        result = subprocess.run(['python3', script])
+        result = subprocess.run([sys.executable, script])
         if result.returncode != 0:
             print(f"Error: {script} exited with code {result.returncode}", file=sys.stderr)
             sys.exit(result.returncode)
