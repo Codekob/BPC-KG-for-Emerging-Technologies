@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import pandas as pd
 import json
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load your OpenAI key from .env (set OPENAI_API_KEY)
 load_dotenv()
@@ -70,9 +71,26 @@ def enrich_technologies(input_csv, output_json):
     df = pd.read_csv(input_csv, encoding="latin-1")
     if "Technology Name" not in df.columns:
         df.columns = ["Technology Name"]
-    df["Definition"] = df["Technology Name"].apply(fetch_definition)
-    df["Synonyms"] = df["Technology Name"].apply(fetch_synonyms)
-    df["Top Domain Keywords"] = df["Technology Name"].apply(fetch_top_domain_keywords)
+
+    tech_names = df["Technology Name"].tolist()
+    results = [None] * len(tech_names)
+
+    def enrich_one(idx_tech):
+        idx, tech = idx_tech
+        definition = fetch_definition(tech)
+        synonyms = fetch_synonyms(tech)
+        keywords = fetch_top_domain_keywords(tech)
+        return idx, definition, synonyms, keywords
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = {executor.submit(enrich_one, (i, tech)): i for i, tech in enumerate(tech_names)}
+        for future in as_completed(futures):
+            idx, definition, synonyms, keywords = future.result()
+            results[idx] = (definition, synonyms, keywords)
+
+    df["Definition"] = [r[0] for r in results]
+    df["Synonyms"] = [r[1] for r in results]
+    df["Top Domain Keywords"] = [r[2] for r in results]
     df["Synonyms"] = df["Synonyms"].apply(lambda x: json.loads(x) if x != 'I don\'t know' else x)
     df["Top Domain Keywords"] = df["Top Domain Keywords"].apply(lambda x: json.loads(x) if x != 'I don\'t know' else x)
     df.to_json(output_json, orient="records", indent=2)
