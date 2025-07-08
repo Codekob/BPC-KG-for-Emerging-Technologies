@@ -223,13 +223,20 @@ def main() -> None:
         "--tech-input", str(repo_root / args.tech_csv),
         "--tech-output", str(repo_root / "pipeline" / "technologies_normalized.csv"),
     ], check=True)
-    enrich_technologies(str(repo_root / "pipeline" / "technologies_normalized.csv"))
-    
+
+    # Call enrich.py as a script, outputting JSON
+    tech_norm_csv = str(repo_root / "pipeline" / "technologies_normalized.csv")
+    tech_defs_json = str(repo_root / "pipeline" / "technologies_with_definitions.json")
+    subprocess.run([
+        "python", str(repo_root / "scripts" / "enrich" / "enrich.py"),
+        "--input", tech_norm_csv,
+        "--output", tech_defs_json
+    ], check=True)
     
     subprocess.run(["python", str(repo_root / "scripts" / "classify" / "classify_papers.py"),
                     "--papers", str(papers_dir / "papers_normalized.csv"),
                     "--techs", str(repo_root / "pipeline" / "technologies_normalized.csv"),
-                    "--defs", str(repo_root / "pipeline" / "technologies_with_definitions.csv"),
+                    "--defs", tech_defs_json,
                     "--output", str(papers_dir / "papers_classified.csv"              
                                   )],
                    check=True)
