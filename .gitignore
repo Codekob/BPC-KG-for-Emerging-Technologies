@@ -15,5 +15,7 @@ pipeline/technologies_with_definitions.csv
 pipeline/papers-data
 pipeline/company-data
 pipeline/neo4j-files
+pipeline/technologies_with_definitions.json
+
 # Ignore .env
 .env 
