@@ -19,3 +19,6 @@ pipeline/technologies_with_definitions.json
 
 # Ignore .env
 .env 
+
+# Ignore institutions
+notebooks/fetching_companies.ipynb

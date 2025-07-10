@@ -178,7 +178,7 @@ def fetch_crunchbase_companies(data_dir: Path) -> None:
             {"type": "predicate", "field_id": "location_identifiers", "operator_id": "includes", "values": ["6106f5dc-823e-5da8-40d7-51612c0b2c4e"]},
         ],
         "order": [{"field_id": "equity_funding_total", "sort": "desc"}],
-        "limit": 200,
+        "limit": 800,
     }
     resp = requests.post(base_url, params=params, headers=headers, json=payload)
     resp.raise_for_status()
