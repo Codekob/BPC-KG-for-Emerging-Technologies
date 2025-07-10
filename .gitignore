@@ -21,3 +21,4 @@ pipeline/technologies_with_definitions.json
 
 # Ignore institutions
 notebooks/fetching_companies.ipynb
+notebooks/linking_metrics.ipynb
