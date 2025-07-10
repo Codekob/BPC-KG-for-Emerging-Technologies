@@ -46,37 +46,48 @@ def enrich_technologies(tech_csv: str) -> Path:
 
 def fetch_and_clean_papers(start_year: int, end_year: int, data_dir: Path) -> Path:
     """Fetch papers from OpenAlex and clean them."""
+    print(f"Fetching papers from {start_year} to {end_year}...")
     data_dir.mkdir(parents=True, exist_ok=True)
     url = "https://api.openalex.org/works"
+    mail_to = MAIL
     years = list(range(end_year, start_year - 1, -1))
     all_papers = []
+    per_page = 200
 
     for year in years:
-        paper_count = 0
+        paper_count = 0 
         page = 1
         while paper_count < 1000:
             params = {
                 "filter": f"publication_year:{year}",
-                "mailto": MAIL,
+                "per-page": 200,
+                "mailto": mail_to,
                 "sort": "cited_by_count:desc",
                 "page": page,
-                "per-page": 200,
-                "select": (
-                    "id, doi, title, publication_date, authorships, cited_by_count, "
-                    "keywords, topics, abstract_inverted_index"
-                ),
+                "per-page": per_page,
+                "select": "id, doi, title, publication_date, authorships, cited_by_count, keywords, topics, abstract_inverted_index"
             }
-            resp = requests.get(url, params=params)
-            if resp.status_code != 200:
-                print(f"Error fetching data for year {year}: {resp.status_code}")
+            
+            response = requests.get(url, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                papers = data.get('results', [])
+                if not papers:
+                    break
+                
+                # Filter out papers with null abstract_inverted_index
+                papers_with_abstract = [p for p in papers if p.get('abstract_inverted_index') is not None]
+                remaining_needed = 1000 - paper_count
+                papers_to_add = papers_with_abstract[:remaining_needed]
+                paper_count += len(papers_to_add)
+                all_papers.extend(papers_to_add)
+                if paper_count >= 1000:
+                    break
+            else:
+                print(f"Error fetching data for year {year}: {response.status_code}")
                 break
-            data = resp.json()
-            papers = data.get("results", [])
-            if not papers:
-                break
-            papers_with_abs = [p for p in papers if p.get("abstract_inverted_index")]
-            paper_count += len(papers_with_abs)
-            all_papers.extend(papers_with_abs)
+            
             page += 1
 
     print(f"Fetched {len(all_papers)} papers")
