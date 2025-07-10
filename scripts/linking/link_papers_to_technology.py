@@ -1,6 +1,7 @@
 import pandas as pd
 import string
 from rapidfuzz import fuzz
+import argparse
 
 
 def normalize_text(text: str) -> str:
@@ -60,4 +61,15 @@ def link_papers_to_technologies(
 
 
 if __name__ == '__main__':
-    link_papers_to_technologies()
+    parser = argparse.ArgumentParser(description="Link papers to technologies")
+    parser.add_argument("--papers", default='../../data/papers-data/papers_classified.csv', help="Input classified papers CSV")
+    parser.add_argument("--techs", default='../../data/technologies-data/technologies_normalized.csv', help="Input technologies CSV")
+    parser.add_argument("--output", default='../../data/papers-data/paper_technology_links.csv', help="Output links CSV")
+    parser.add_argument("--fuzzy-threshold", type=int, default=85, help="Fuzzy matching threshold")
+    args = parser.parse_args()
+    link_papers_to_technologies(
+        papers_csv=args.papers,
+        tech_csv=args.techs,
+        output_csv=args.output,
+        fuzzy_threshold=args.fuzzy_threshold
+    )

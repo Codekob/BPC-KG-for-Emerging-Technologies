@@ -2,6 +2,8 @@
 
 import pandas as pd
 import string
+import argparse
+from pathlib import Path
 from rapidfuzz import fuzz
 
 
@@ -34,8 +36,8 @@ def flatten_list_of_dicts(series, key='display_name'):
 
 
 def normalize_and_dedupe_papers(
-    input_path: str = '../../data/papers-data/cleaned_papers.jsonl',
-    output_path: str = '../../data/papers-data/papers_normalized.csv',
+    input_path: str = 'data/papers-data/cleaned_papers.jsonl',
+    output_path: str = 'data/papers-data/papers_normalized.csv',
     fuzzy_threshold: int = 85
 ):
     df = load_papers(input_path)
@@ -92,11 +94,11 @@ def normalize_and_dedupe_papers(
 
 
 def normalize_and_dedupe_technologies(
-    input_path: str = '../../data/technologies-data/finished_technologies.csv',
-    output_path: str = '../../data/technologies-data/technologies_normalized.csv',
+    input_path: str = 'data/technologies-data/finished_technologies.csv',
+    output_path: str = 'data/technologies-data/technologies_normalized.csv',
     fuzzy_threshold: int = 90
 ):
-    df = pd.read_csv(input_path, header=0, names=['Technology Name'])
+    df = pd.read_csv(input_path, header=0, names=['Technology Name'], quotechar='"')
     df['tech_norm'] = df['Technology Name'].map(normalize_text)
 
     # Exact dedupe
@@ -117,8 +119,31 @@ def normalize_and_dedupe_technologies(
 
 
 def main():
-    normalize_and_dedupe_papers()
-    normalize_and_dedupe_technologies()
+    parser = argparse.ArgumentParser(description="Clean and normalize papers and technologies data")
+    parser.add_argument("--papers-input", default="data/papers-data/cleaned_papers.jsonl", 
+                       help="Input path for papers data (JSONL)")
+    parser.add_argument("--papers-output", default="data/papers-data/papers_normalized.csv",
+                       help="Output path for normalized papers data (CSV)")
+    parser.add_argument("--tech-input", default="data/technologies-data/finished_technologies.csv",
+                       help="Input path for technologies data (CSV)")
+    parser.add_argument("--tech-output", default="data/technologies-data/technologies_normalized.csv",
+                       help="Output path for normalized technologies data (CSV)")
+    parser.add_argument("--papers-fuzzy-threshold", type=int, default=85,
+                       help="Fuzzy matching threshold for papers deduplication")
+    parser.add_argument("--tech-fuzzy-threshold", type=int, default=90,
+                       help="Fuzzy matching threshold for technologies deduplication")
+    
+    args = parser.parse_args()
+    
+    # Get repo root and make paths absolute
+    repo_root = Path(__file__).parent.parent.parent
+    papers_input = repo_root / args.papers_input
+    papers_output = repo_root / args.papers_output
+    tech_input = repo_root / args.tech_input
+    tech_output = repo_root / args.tech_output
+    
+    normalize_and_dedupe_papers(str(papers_input), str(papers_output), args.papers_fuzzy_threshold)
+    normalize_and_dedupe_technologies(str(tech_input), str(tech_output), args.tech_fuzzy_threshold)
 
 
 if __name__ == '__main__':
