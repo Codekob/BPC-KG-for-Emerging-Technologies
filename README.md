@@ -21,7 +21,7 @@ year range for the papers you want to fetch:
 
 ```bash
 python pipeline/run_pipeline.py \
-  --tech-csv pipeline/technlist.csv \
+  --tech-csv pipeline/techlist.csv \
   --start-year 2019 --end-year 2024
 ```
 
