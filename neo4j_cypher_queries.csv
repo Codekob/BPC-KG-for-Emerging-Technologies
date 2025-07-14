@@ -1,0 +1,61 @@
+name,description,query,id,parentId,isFolder
+Link Tech to company,,"LOAD CSV WITH HEADERS FROM 'file:///company_technology_links.csv' AS row
+
+// Match existing company and technology nodes
+MATCH (c:Company {company_id: row.company_id})
+MATCH (t:Technology {tech_name: row.technology_name})
+
+// Create relationship
+MERGE (c)-[:USES]->(t);",0,,false
+Link papers to technologies,,"LOAD CSV WITH HEADERS FROM 'file:///paper_technology_links.csv' AS row
+
+// Match existing company and technology nodes
+MATCH (p:Paper {paper_id: row.paper_id})
+MATCH (t:Technology {tech_name: row.technology_name})
+
+// Create relationship
+MERGE (p)-[:TALKS_ABOUT]->(t);",1,,false
+Get all the companies -> uses -> technology,,"MATCH p=()-[:USES]->() RETURN p ",2,,false
+How many Talks_about links,,"MATCH ()-[r:TALKS_ABOUT]->()
+RETURN count(r) AS totalTalksAbout
+",3,,false
+Most talked about technologies,,"MATCH (p:Paper)-[:TALKS_ABOUT]->(t:Technology)
+RETURN t.tech_name AS Technology, COUNT(p) AS PaperCount
+ORDER BY PaperCount DESC
+LIMIT 3;
+",4,,false
+Most used Technologies by Companies,,"MATCH (c:Company)-[:USES]->(t:Technology)
+RETURN t.tech_name AS Technology, COUNT(c) AS CompanyCount
+ORDER BY CompanyCount DESC
+LIMIT 3;
+",5,,false
+Get papers that talk about a Tech,,"MATCH (p:Paper)-[:TALKS_ABOUT]->(t:Technology {tech_name: ""Quantum Technologies""})
+RETURN p.paper_id AS PaperID, p.title AS Title, p.authors AS Authors, p.pub_date AS Published
+ORDER BY p.pub_date DESC;
+",6,,false
+How much funding per Technology,,"MATCH (c:Company)-[:USES]->(t:Technology)
+WITH t.tech_name AS Technology, AVG(c.funding_total_usd) AS AvgFunding
+RETURN Technology, AvgFunding
+ORDER BY AvgFunding DESC;
+",7,,false
+Companies vs Paper -> Technology links,,"MATCH (t:Technology)
+OPTIONAL MATCH (p:Paper)-[:TALKS_ABOUT]->(t)
+WITH t, COUNT(p) AS paperCount
+OPTIONAL MATCH (c:Company)-[:USES]->(t)
+WITH t, paperCount, COUNT(c) AS companyCount
+WHERE paperCount > companyCount
+RETURN
+  t.tech_name       AS Technology,
+  paperCount        AS Papers,
+  companyCount      AS Companies,
+  (paperCount - companyCount) AS PaperCompanyGap
+ORDER BY PaperCompanyGap DESC;
+",8,,false
+Top institutions overall (across all technologies),,"MATCH (p:Paper)
+UNWIND p.institutions    AS inst
+WITH trim(inst)   AS Institution
+RETURN Institution,
+       COUNT(*)    AS PaperCount
+ORDER BY PaperCount DESC
+LIMIT 10;
+",9,,false
