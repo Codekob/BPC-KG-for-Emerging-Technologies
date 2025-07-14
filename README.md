@@ -65,7 +65,21 @@ Importing the node files in neo4j is very straigt forward and easy in Neo4j Desk
 2. Add a label and select the respective file to map. Map the properties from file
 <img width="946" height="672" alt="image" src="https://github.com/user-attachments/assets/63450589-0877-485e-82f4-af760597920c" />
 
-3. Hit "Run import" and repeat this step for all of the three node files
+3. Hit "Run import" and repeat this step for Companies and Technologies. HOWEVER NOT FOR THE PAPERS
+4. For the papers, upload the paper nodes into the import folder. Where to find this folder is specified here: [Default file locations - Operations Manual](https://neo4j.com/docs/operations-manual/current/configuration/file-locations/#neo4j-import)
+5. Execute this cypher query:
+```cypher
+LOAD CSV WITH HEADERS FROM "file:///papers_nodes.csv" AS row
+CREATE (p:Paper {
+  paper_id:    row.paper_id,
+  link:        row.link,
+  title:       row.title,
+  authors:     coalesce(split(row.authors, ";"), []),
+  pub_date:    date(row.pub_date),
+  institutions: coalesce(split(row.institution, ";"), [])
+});
+```
+This is because we need to have authors and institutions in an array. 
 
 **Importing Relationships**
 This step requires entering cypher queries and uploading the link files to a specific folder.
