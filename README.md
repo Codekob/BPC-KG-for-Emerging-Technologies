@@ -107,3 +107,51 @@ MERGE (p)-[:TALKS_ABOUT]->(t);
 ```
 The company-paper link file is optional as it is just the transitive linking of paper-technology -> technology-company
 
+## Knowledge Graph Schema
+
+### Entities
+
+---
+
+#### 1. Company
+
+| Property            | Type       | Description               |
+|--------------------|------------|--------------------------|
+| company_id (id)    | string     |               id - crunchbase permalink      |
+| company_name       | string     |         name of the company     |
+| founding_date      | datetime   |       founding date of the company                   |
+| location           | string     |location where the company is situated    |
+| funding_total_usd  | float      |                    total funding the company in USD $      |
+| funding_stage      | string     |             funding stage (late stage venture, early stage venture)             |
+
+---
+
+#### 2. Paper
+
+| Property            | Type       | Description               |
+|--------------------|------------|--------------------------|
+| paper_id           | string     |           OpenAlex ID               |
+| link               | string (URL)|            link to OpenAlex Page              |
+| title              | string     |               Title of the Paper           |
+| authors            | array      |authors of the paper       |
+| pub_date           | datetime   |publication date           |
+| institutions       | array      |institutions that are affiliated with any author of the paper              |
+
+---
+
+#### 3. Technology
+
+| Property            | Type       | Description               |
+|--------------------|------------|--------------------------|
+| tech_name          | string     |name of the technology                          |
+| description        | string     |short description of the technology    |
+
+---
+
+### Relationships
+
+- **Company → USES → Technology**
+- **Paper → TALKS_ABOUT → Technology**
+
+
+
