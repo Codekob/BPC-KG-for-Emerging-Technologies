@@ -33,6 +33,8 @@ How to Use
 2. Edit the `.env` file to set your email address for OpenAlex as well as your
    `OPENAI_API_KEY` and `CRUNCHBASE_API_KEY`.
 
+   - **If you do not have a Crunchbase API key**, you can still run the pipeline! Set `CRUNCHBASE_API_KEY=NO_KEY` in your `.env` file. In this case, the pipeline will use a static snapshot of company data (as of 1 July 2025) located at `pipeline/company-data/crunchbase_fetching_raw.json` instead of fetching fresh data from the Crunchbase API.
+
 3. Install dependencies
     ```bash
     pip install -r requirements.txt
@@ -49,6 +51,9 @@ python pipeline/run_pipeline.py \
   --tech-csv pipeline/techlist.csv \
   --start-year 2019 --end-year 2024
 ```
+
+- If you set `CRUNCHBASE_API_KEY=NO_KEY`, the pipeline will use the company snapshot data from 1 July 2025 (`pipeline/company-data/crunchbase_fetching_raw.json`).
+- If you provide a valid Crunchbase API key, the pipeline will fetch the latest company data from Crunchbase as before.
 
 The resulting Neo4j import file will be written to
 `pipeline/neo4j-files`.

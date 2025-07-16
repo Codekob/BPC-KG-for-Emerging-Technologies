@@ -12,7 +12,7 @@ pipeline/techlist.csv
 pipeline/technologies_normalized.csv
 pipeline/technologies_with_definitions.csv
 pipeline/papers-data
-pipeline/company-data
+pipeline/company-data/*.csv
 pipeline/neo4j-files/*
 pipeline/technologies_with_definitions.json
 
@@ -22,3 +22,4 @@ pipeline/technologies_with_definitions.json
 # Ignore institutions
 notebooks/fetching_companies.ipynb
 notebooks/linking_metrics.ipynb
+
