@@ -164,8 +164,17 @@ def fetch_and_clean_papers(start_year: int, end_year: int, data_dir: Path) -> Pa
 
 
 def fetch_crunchbase_companies(data_dir: Path) -> None:
-    """Fetch companies from Crunchbase and save small CSV."""
+    """Fetch companies from Crunchbase and save small CSV, or use local file if CRUNCHBASE_API_KEY is 'NO_KEY'."""
     data_dir.mkdir(parents=True, exist_ok=True)
+    raw_json = data_dir / "crunchbase_fetching_raw.json"
+    if CRUNCHBASE_API_KEY == "NO_KEY":
+        if raw_json.exists():
+            print(f"CRUNCHBASE_API_KEY is 'NO_KEY'. Using local file: {raw_json}")
+        else:
+            print(f"CRUNCHBASE_API_KEY is 'NO_KEY', but {raw_json} does not exist! Aborting.")
+            raise FileNotFoundError(f"Required file not found: {raw_json}")
+        return
+    # Otherwise, fetch from API as before
     base_url = "https://api.crunchbase.com/v4/data/searches/organizations"
     params = {"user_key": CRUNCHBASE_API_KEY}
     headers = {"Content-Type": "application/json"}
@@ -195,7 +204,6 @@ def fetch_crunchbase_companies(data_dir: Path) -> None:
     resp.raise_for_status()
     data = resp.json().get("entities", [])
 
-    raw_json = data_dir / "crunchbase_fetching_raw.json"
     with open(raw_json, "w") as fh:
         json.dump(data, fh, indent=2)
 
@@ -220,9 +228,7 @@ def main() -> None:
     parser.add_argument("--start-year", type=int, required=True, help="Start year for papers")
     parser.add_argument("--end-year", type=int, required=True, help="End year for papers")
     args = parser.parse_args()
-    
-    
-
+    print("Starting Pipeline...")
     repo_root = Path(__file__).parent.parent
     papers_dir = repo_root / "pipeline" / "papers-data"
     company_dir = repo_root / "pipeline" / "company-data"
